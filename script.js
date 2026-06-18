@@ -1,3 +1,6 @@
+import { db } from "./firebase-config.js";
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
 const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navLinksContainer = document.getElementById('navLinks');
@@ -65,7 +68,7 @@ const revealObserver = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-// Contact form (Formspree)
+// Contact form — writes to Firestore, Cloud Function handles the email
 const form = document.getElementById('contactForm');
 const formStatus = document.getElementById('formStatus');
 
@@ -77,21 +80,23 @@ form.addEventListener('submit', async (e) => {
     btn.disabled = true;
     formStatus.textContent = '';
 
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const message = form.message.value.trim();
+
     try {
-        const res = await fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form),
-            headers: { Accept: 'application/json' },
+        await addDoc(collection(db, 'contacts'), {
+            name,
+            email,
+            message,
+            sentAt: serverTimestamp(),
         });
 
-        if (res.ok) {
-            formStatus.textContent = 'Message sent — thanks!';
-            form.reset();
-        } else {
-            formStatus.textContent = 'Something went wrong. Try emailing directly.';
-        }
-    } catch {
-        formStatus.textContent = 'Network error. Try emailing directly.';
+        formStatus.textContent = 'Message sent — thanks!';
+        form.reset();
+    } catch (err) {
+        console.error(err);
+        formStatus.textContent = 'Something went wrong. Try emailing directly.';
     }
 
     btn.textContent = 'Send Message';
