@@ -9,7 +9,7 @@ Personal portfolio site for Aditya Vikram Singh. Plain HTML/CSS/JS frontend, no 
 | File | Purpose |
 |------|---------|
 | `index.html` | All page content plus the inline theme bootstrapping script and non-module theme toggle logic |
-| `style.css` | All styling - CSS custom properties at `:root`, responsive media queries, dark theme variables, animated navbar toggle |
+| `style.css` | All styling - CSS custom properties at `:root`, responsive media queries, dark theme variables, animated navbar toggle, dedicated project badge colors |
 | `script.js` | Nav scroll behavior, scroll-reveal animations, contact form submit handler |
 | `firebase-config.js` | Firebase SDK init (public API keys, safe to commit) - exports `db`, `analytics`, and `functions` |
 | `firestore.rules` | Security rules for the `contacts` collection |
@@ -24,6 +24,7 @@ Personal portfolio site for Aditya Vikram Singh. Plain HTML/CSS/JS frontend, no 
 2. Navbar toggle button (`#themeToggle`) is rendered in `index.html`.
 3. Inline script before `script.js` keeps the toggle's `aria-pressed` state in sync, persists theme changes, and follows system theme changes when no saved preference exists.
 4. `style.css` switches site colors using `[data-theme="dark"]` variables and animates the custom toggle via `aria-pressed`.
+5. Project badges use dedicated `--badge-bg` and `--badge-text` variables so labels like "Hackathon Winner" stay balanced in dark mode.
 
 ## Contact form flow
 
