@@ -1,14 +1,14 @@
-# Aditya Vikram Singh — Portfolio Website
+# Aditya Vikram Singh - Portfolio Website
 
 Personal portfolio and resume website for Aditya Vikram Singh, MS Computer Science student at Appalachian State University.
 
 ## Stack
 
-Plain HTML, CSS, and JavaScript — no build step or framework required. Open `index.html` in a browser to view locally.
+Plain HTML, CSS, and JavaScript on Firebase Hosting, with a Firebase Function-powered contact form.
 
-## Contact Form
+## Local Preview
 
-The contact form uses [Formspree](https://formspree.io). To activate it, replace `YOUR_FORM_ID` in the `<form>` action inside `index.html` with your Formspree form ID.
+Open `index.html` in a browser to view the site locally.
 
 ## Live Site
 

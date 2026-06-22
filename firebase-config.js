@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+import { getFunctions } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCVee3l5kLSpYE3VbLrUUdjPBYMjRv8HCw",
@@ -16,3 +17,4 @@ const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 export const analytics = getAnalytics(app);
+export const functions = getFunctions(app);

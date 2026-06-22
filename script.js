@@ -1,5 +1,5 @@
-import { db } from "./firebase-config.js";
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { functions } from "./firebase-config.js";
+import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js";
 
 const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
@@ -68,35 +68,54 @@ const revealObserver = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-// Contact form — writes to Firestore, Cloud Function handles the email
+// Contact form — calls Cloud Function which validates, rate-limits, and sends email
 const form = document.getElementById('contactForm');
 const formStatus = document.getElementById('formStatus');
+const submitContact = httpsCallable(functions, 'submitContact');
+
+const SUBMIT_COOLDOWN_MS = 60_000;
+let lastSubmitTime = 0;
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // Honeypot: bots fill the hidden website field, humans leave it blank
+    if (form.website.value) return;
+
+    // Client-side cooldown (server enforces the real limit)
+    const elapsed = Date.now() - lastSubmitTime;
+    if (elapsed < SUBMIT_COOLDOWN_MS) {
+        const wait = Math.ceil((SUBMIT_COOLDOWN_MS - elapsed) / 1000);
+        formStatus.textContent = `Please wait ${wait}s before sending another message.`;
+        return;
+    }
+
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const message = form.message.value.trim();
+
+    if (name.length > 100 || email.length > 200 || message.length > 2000) {
+        formStatus.textContent = 'Input too long — name ≤ 100, message ≤ 2000 characters.';
+        return;
+    }
 
     const btn = form.querySelector('button[type="submit"]');
     btn.textContent = 'Sending…';
     btn.disabled = true;
     formStatus.textContent = '';
 
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const message = form.message.value.trim();
-
     try {
-        await addDoc(collection(db, 'contacts'), {
-            name,
-            email,
-            message,
-            sentAt: serverTimestamp(),
-        });
-
+        await submitContact({ name, email, message });
+        lastSubmitTime = Date.now();
         formStatus.textContent = 'Message sent — thanks!';
         form.reset();
     } catch (err) {
         console.error(err);
-        formStatus.textContent = 'Something went wrong. Try emailing directly.';
+        if (err.code === 'functions/resource-exhausted') {
+            formStatus.textContent = 'Too many messages from your location. Please try again tomorrow.';
+        } else {
+            formStatus.textContent = 'Something went wrong. Try emailing directly.';
+        }
     }
 
     btn.textContent = 'Send Message';

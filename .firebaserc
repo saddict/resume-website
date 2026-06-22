@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "resume-website-445c0"
-  }
+  },
+  "targets": {
+    "resume-website-445c0": {
+      "hosting": {
+        "main": [
+          "aditya-vikram-singh"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
